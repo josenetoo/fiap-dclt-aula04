@@ -117,9 +117,20 @@ ls -la .github/workflows/
 
 ---
 
-## 📦 Parte 4: Workflow 1 - Build e Push Docker
+## 📦 Parte 4: Criar Pipeline GitOps Unificado
 
-### Passo 4: Criar docker-build.yml
+### Passo 4: Criar gitops-pipeline.yml
+
+**⚠️ Nota Importante:**
+- Vamos criar **1 único arquivo** com **4 jobs** sequenciais
+- Cada job representa uma etapa do pipeline GitOps
+- Jobs executam em sequência usando `needs:`
+
+**Estrutura do Pipeline:**
+```
+Job 1: Build & Push    → Job 2: Update GitOps → Job 3: ArgoCD Sync → Job 4: Summary
+  🐳 Docker              📝 Kustomize             🔄 Sync              📊 Report
+```
 
 **Linux / macOS:**
 ```bash
@@ -129,7 +140,7 @@ cd fiap-dclt-aula04
 # Criar estrutura de diretórios
 mkdir -p .github/workflows
 
-# Criar arquivo docker-build.yml
+# Criar arquivo gitops-pipeline.yml
 cat > .github/workflows/docker-build.yml << 'EOF'
 name: 🐳 Build and Push Docker Image
 
@@ -139,9 +150,6 @@ on:
     paths: 
       - 'app/**'
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 env:
   AWS_REGION: us-east-1
@@ -177,40 +185,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "✅ Image pushed: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       
-      - name: 🔧 Setup Kustomize
-        run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
-      
-      - name: 📝 Update GitOps manifests
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          cd gitops-repo/applications/fiap-todo-api/overlays/production
-          
-          # Update image tag in kustomization.yaml
-          kustomize edit set image \
-            fiap-todo-api=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          
-          echo "✅ Updated image tag to: $IMAGE_TAG"
-      
-      - name: 💾 Commit and push changes
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          
-          git add gitops-repo/applications/fiap-todo-api/overlays/production/kustomization.yaml
-          
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "🚀 Update production image to $IMAGE_TAG"
-            git push origin main
-          fi
-      
       - name: 📊 Summary
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -220,9 +194,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\`" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ✅ Built and Pushed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**GitOps:** ✅ Manifests Updated" >> $GITHUB_STEP_SUMMARY
-          echo "**ArgoCD:** 🔄 Will auto-sync in ~3 minutes" >> $GITHUB_STEP_SUMMARY
 EOF
 
 echo "✅ Arquivo docker-build.yml criado!"
@@ -232,16 +203,9 @@ echo "✅ Arquivo docker-build.yml criado!"
 
 ---
 
-## 📝 Parte 5: Workflow 2 - Update Image Tag (Opcional)
+## 📝 Parte 5: Workflow 2 - Update Image Tag
 
-**⚠️ Nota Importante:**
-- O workflow `docker-build.yml` **já atualiza automaticamente** os manifests GitOps
-- Este workflow `update-image.yml` é **opcional** e serve para:
-  - Atualizar manualmente para uma tag específica (ex: rollback para v1.0.0)
-  - Promover uma imagem entre ambientes
-  - Casos onde você quer controle manual da versão
-
-### Passo 5: Criar update-image.yml (Opcional)
+### Passo 5: Criar update-image.yml
 
 **Linux / macOS:**
 ```bash
