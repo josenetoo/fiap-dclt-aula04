@@ -1,0 +1,116 @@
+# ============================================
+# DEPLOYMENT: FIAP Todo API
+# ============================================
+# Deployment base para a aplicação Todo API
+# Gerenciado via GitOps (ArgoCD/FluxCD)
+# ============================================
+
+apiVersion: apps/v1
+kind: Deployment
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  name: fiap-todo-api                    # Nome do deployment
+  labels:
+    app: fiap-todo-api                   # Label principal da aplicação
+    managed-by: gitops                   # Indica gerenciamento GitOps
+
+# ============================================
+# SPEC
+# ============================================
+spec:
+  replicas: 2                            # Número de réplicas (pode ser sobrescrito por overlays)
+  
+  # ============================================
+  # SELECTOR
+  # ============================================
+  selector:
+    matchLabels:
+      app: fiap-todo-api                 # Seleciona pods com esta label
+  
+  # ============================================
+  # TEMPLATE DO POD
+  # ============================================
+  template:
+    metadata:
+      labels:
+        app: fiap-todo-api               # Label aplicada aos pods
+    
+    spec:
+      # ============================================
+      # CONTAINERS
+      # ============================================
+      containers:
+      - name: fiap-todo-api              # Nome do container
+        image: YOUR_ECR_URI/fiap-todo-api:v1.0.1  # Imagem (substituir YOUR_ECR_URI)
+        
+        # ============================================
+        # PORTAS
+        # ============================================
+        ports:
+        - containerPort: 3000            # Porta da aplicação Node.js
+          name: http                     # Nome da porta
+        
+        # ============================================
+        # VARIÁVEIS DE AMBIENTE
+        # ============================================
+        env:
+        - name: NODE_ENV
+          value: "production"            # Ambiente de execução
+        - name: VERSION
+          value: "v1.0.1"                # Versão da aplicação
+        - name: DEPLOYMENT_TYPE
+          value: "gitops"                # Tipo de deployment
+        
+        # ============================================
+        # RECURSOS
+        # ============================================
+        resources:
+          requests:                      # Recursos mínimos garantidos
+            memory: "128Mi"              # Memória mínima
+            cpu: "100m"                  # CPU mínima (0.1 core)
+          limits:                        # Recursos máximos permitidos
+            memory: "256Mi"              # Memória máxima
+            cpu: "200m"                  # CPU máxima (0.2 core)
+        
+        # ============================================
+        # LIVENESS PROBE
+        # ============================================
+        # Verifica se o container está vivo
+        # Se falhar, Kubernetes reinicia o pod
+        livenessProbe:
+          httpGet:
+            path: /health                # Endpoint de health check
+            port: 3000                   # Porta do health check
+          initialDelaySeconds: 30        # Aguarda 30s antes da primeira verificação
+          periodSeconds: 10              # Verifica a cada 10s
+          timeoutSeconds: 5              # Timeout de 5s por verificação
+          failureThreshold: 3            # Reinicia após 3 falhas consecutivas
+        
+        # ============================================
+        # READINESS PROBE
+        # ============================================
+        # Verifica se o container está pronto para receber tráfego
+        # Se falhar, remove o pod do Service
+        readinessProbe:
+          httpGet:
+            path: /health                # Endpoint de health check
+            port: 3000                   # Porta do health check
+          initialDelaySeconds: 5         # Aguarda 5s antes da primeira verificação
+          periodSeconds: 5               # Verifica a cada 5s
+          timeoutSeconds: 3              # Timeout de 3s por verificação
+          failureThreshold: 3            # Remove do Service após 3 falhas
+        
+        # ============================================
+        # SECURITY CONTEXT
+        # ============================================
+        # Configurações de segurança do container
+        securityContext:
+          allowPrivilegeEscalation: false  # Não permite escalação de privilégios
+          runAsNonRoot: true               # Não executa como root
+          runAsUser: 1001                  # UID do usuário (não-root)
+          capabilities:
+            drop:
+            - ALL                          # Remove todas as capabilities Linux

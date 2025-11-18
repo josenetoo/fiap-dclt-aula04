@@ -1,0 +1,60 @@
+# ============================================
+# FLUXCD KUSTOMIZATION: FIAP Todo API
+# ============================================
+# Define como o FluxCD aplica os manifests do Git
+# Kustomize Controller reconcilia este recurso
+# ============================================
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  name: fiap-todo-api                    # Nome da Kustomization
+  namespace: flux-system                 # Namespace do FluxCD
+
+# ============================================
+# SPEC
+# ============================================
+spec:
+  interval: 5m0s                         # Intervalo de reconciliação (verifica estado a cada 5 min)
+  
+  # ============================================
+  # PATH
+  # ============================================
+  path: "./applications/fiap-todo-api/overlays/production"  # Path dos manifests no repo
+  
+  # ============================================
+  # PRUNE
+  # ============================================
+  prune: true                            # Remove recursos deletados do Git
+  
+  # ============================================
+  # SOURCE REF
+  # ============================================
+  # Referência ao GitRepository source
+  sourceRef:
+    kind: GitRepository                  # Tipo do source
+    name: fiap-todo-api                  # Nome do GitRepository
+  
+  # ============================================
+  # TARGET NAMESPACE
+  # ============================================
+  targetNamespace: fiap-todo-flux        # Namespace onde recursos serão aplicados
+  
+  # ============================================
+  # HEALTH CHECKS
+  # ============================================
+  # Verifica saúde dos recursos após aplicação
+  healthChecks:
+  - apiVersion: apps/v1                  # API version do recurso
+    kind: Deployment                     # Tipo do recurso
+    name: fiap-todo-api                  # Nome do recurso
+    namespace: fiap-todo-flux            # Namespace do recurso
+  
+  # ============================================
+  # TIMEOUT
+  # ============================================
+  timeout: 2m0s                          # Timeout para aplicação dos manifests

@@ -1,0 +1,40 @@
+# ============================================
+# FLUXCD GITREPOSITORY: FIAP Todo API
+# ============================================
+# Define o repositório Git como source para o FluxCD
+# Source Controller monitora este repo por mudanças
+# ============================================
+
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  name: fiap-todo-api                    # Nome do GitRepository
+  namespace: flux-system                 # Namespace do FluxCD
+
+# ============================================
+# SPEC
+# ============================================
+spec:
+  interval: 1m0s                         # Intervalo de polling (verifica Git a cada 1 minuto)
+  
+  # ============================================
+  # REF (Branch/Tag/Commit)
+  # ============================================
+  ref:
+    branch: main                         # Branch a ser monitorada
+  
+  # ============================================
+  # URL
+  # ============================================
+  url: https://github.com/YOUR-ORG/fiap-gitops-repo  # URL do repositório Git
+  
+  # ============================================
+  # SECRET REF
+  # ============================================
+  # Secret com credenciais para acessar repositório privado
+  secretRef:
+    name: flux-system                    # Nome do secret (criado pelo flux bootstrap)

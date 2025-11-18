@@ -1,0 +1,85 @@
+# ============================================
+# ARGOCD APPLICATION: FIAP Todo API
+# ============================================
+# Define a aplicação no ArgoCD
+# Configura source (Git), destination (cluster) e sync policy
+# ============================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  name: fiap-todo-api                    # Nome da aplicação no ArgoCD
+  namespace: argocd                      # Namespace do ArgoCD
+  labels:
+    app: fiap-todo-api                   # Label da aplicação
+  
+  # ============================================
+  # FINALIZERS
+  # ============================================
+  # Garante que recursos sejam deletados quando Application for removida
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+
+# ============================================
+# SPEC
+# ============================================
+spec:
+  project: default                       # Projeto ArgoCD (default = sem restrições)
+  
+  # ============================================
+  # SOURCE (Git Repository)
+  # ============================================
+  # Define de onde vêm os manifests
+  source:
+    repoURL: https://github.com/YOUR-ORG/fiap-gitops-repo  # URL do repositório Git
+    targetRevision: HEAD                 # Branch/tag/commit (HEAD = última versão da branch)
+    path: applications/fiap-todo-api/overlays/production   # Path dos manifests no repo
+  
+  # ============================================
+  # DESTINATION (Kubernetes Cluster)
+  # ============================================
+  # Define onde os recursos serão aplicados
+  destination:
+    server: https://kubernetes.default.svc  # Cluster Kubernetes (default = cluster local)
+    namespace: fiap-todo-prod            # Namespace de destino
+  
+  # ============================================
+  # SYNC POLICY
+  # ============================================
+  # Configura como o ArgoCD sincroniza a aplicação
+  syncPolicy:
+    # ============================================
+    # AUTOMATED SYNC
+    # ============================================
+    automated:
+      prune: true                        # Remove recursos deletados do Git
+      selfHeal: true                     # Corrige drift automático (self-healing)
+      allowEmpty: false                  # Não permite aplicação vazia
+    
+    # ============================================
+    # SYNC OPTIONS
+    # ============================================
+    syncOptions:
+    - CreateNamespace=true               # Cria namespace automaticamente se não existir
+    - PrunePropagationPolicy=foreground  # Deleta recursos em foreground (aguarda finalização)
+    - PruneLast=true                     # Deleta recursos no final do sync
+    
+    # ============================================
+    # RETRY POLICY
+    # ============================================
+    # Política de retry em caso de falha
+    retry:
+      limit: 5                           # Máximo de 5 tentativas
+      backoff:
+        duration: 5s                     # Aguarda 5s antes do primeiro retry
+        factor: 2                        # Multiplica duração por 2 a cada retry (5s, 10s, 20s...)
+        maxDuration: 3m                  # Duração máxima entre retries
+  
+  # ============================================
+  # REVISION HISTORY
+  # ============================================
+  revisionHistoryLimit: 3                # Mantém histórico das últimas 3 revisões

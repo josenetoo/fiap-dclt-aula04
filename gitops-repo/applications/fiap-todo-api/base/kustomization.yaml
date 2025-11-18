@@ -1,0 +1,25 @@
+# ============================================
+# KUSTOMIZATION: FIAP Todo API Base
+# ============================================
+# Configuração base do Kustomize
+# Define recursos e labels comuns
+# ============================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ============================================
+# RECURSOS
+# ============================================
+# Lista de manifestos Kubernetes a serem aplicados
+resources:
+- deployment.yaml                        # Deployment da aplicação
+- service.yaml                           # Service para expor a aplicação
+
+# ============================================
+# LABELS COMUNS
+# ============================================
+# Labels aplicadas a todos os recursos
+commonLabels:
+  app: fiap-todo-api                     # Identificador da aplicação
+  managed-by: gitops                     # Indica gerenciamento GitOps

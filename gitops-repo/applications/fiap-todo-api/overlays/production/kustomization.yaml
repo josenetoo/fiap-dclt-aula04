@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fiap-todo-prod
+
+resources:
+- ../../base
+
+patchesStrategicMerge:
+- deployment-patch.yaml
+
+commonLabels:
+  environment: production
+
+images:
+- name: YOUR_ECR_URI/fiap-todo-api
+  newTag: v1.0.1
