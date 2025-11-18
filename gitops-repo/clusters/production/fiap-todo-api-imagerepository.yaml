@@ -4,7 +4,7 @@ metadata:
   name: fiap-todo-api
   namespace: flux-system
 spec:
-  image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/fiap-todo-api
-  interval: 1m                    # Verifica ECR a cada 1 minuto
+  image: 777870534201.dkr.ecr.us-east-1.amazonaws.com/fiap-todo-api
+  interval: 1m
   secretRef:
-    name: ecr-credentials         # Credenciais AWS (criar depois)
+    name: ecr-credentials
