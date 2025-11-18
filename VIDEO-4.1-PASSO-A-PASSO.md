@@ -313,7 +313,21 @@ echo "✅ Imagem publicada: ${ECR_URI}/fiap-todo-api:v1.0.0"
 echo "⚠️ Usando nginx:alpine como exemplo"
 ```
 
-### Passo 11: Atualizar Manifests com a Imagem
+### Passo 11: Instalar Kustomize
+
+```bash
+# macOS
+brew install kustomize
+
+# Linux
+curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+sudo mv kustomize /usr/local/bin/
+
+# Verificar instalação
+kustomize version
+```
+
+### Passo 12: Atualizar Manifests com a Imagem
 
 ```bash
 # Atualizar kustomization.yaml com a imagem real
@@ -346,7 +360,7 @@ patches:
   - path: deployment-patch.yaml
 ```
 
-### Passo 12: Commit e Push das Mudanças
+### Passo 13: Commit e Push das Mudanças
 
 ```bash
 # Adicionar mudanças
@@ -365,7 +379,7 @@ echo "✅ Manifests atualizados no Git!"
 
 ## 🚀 Parte 5: Deploy com ArgoCD
 
-### Passo 13: Criar Application no ArgoCD
+### Passo 14: Criar Application no ArgoCD
 
 ```bash
 # Ver Application manifest
@@ -399,7 +413,7 @@ spec:
       - CreateNamespace=true
 ```
 
-### Passo 14: Aplicar Application
+### Passo 15: Aplicar Application
 
 ```bash
 # Criar namespace para a aplicação
@@ -415,7 +429,7 @@ argocd app list
 argocd app get fiap-todo-api
 ```
 
-### Passo 15: Sync Manual (primeira vez)
+### Passo 16: Sync Manual (primeira vez)
 
 ```bash
 # Sync da aplicação
@@ -432,7 +446,7 @@ argocd app get fiap-todo-api
 
 ## 🔄 Parte 6: Testar GitOps Workflow
 
-### Passo 16: Ver Aplicação Deployada
+### Passo 17: Ver Aplicação Deployada
 
 ```bash
 # Ver pods
@@ -445,7 +459,7 @@ kubectl get service -n fiap-todo-prod
 kubectl logs -l app=fiap-todo-api -n fiap-todo-prod --tail=50
 ```
 
-### Passo 17: Fazer Mudança no Git
+### Passo 18: Fazer Mudança no Git
 
 ```bash
 cd ~/fiap-cicd-handson/aula-04
@@ -477,7 +491,7 @@ git commit -m "feat: aumentar replicas para 5"
 git push origin main
 ```
 
-### Passo 18: Ver Auto-Sync
+### Passo 19: Ver Auto-Sync
 
 ```bash
 # ArgoCD vai detectar a mudança automaticamente (3 min)
@@ -496,7 +510,7 @@ kubectl get deployment -n fiap-todo-prod
 
 ## 🔍 Parte 7: ArgoCD UI
 
-### Passo 19: Explorar UI
+### Passo 20: Explorar UI
 
 **No ArgoCD UI (https://localhost:8080):**
 
@@ -517,7 +531,7 @@ kubectl get deployment -n fiap-todo-prod
    - Ver histórico de syncs
    - Cada commit do Git aparece aqui
 
-### Passo 20: Testar Self-Healing
+### Passo 21: Testar Self-Healing
 
 ```bash
 # Deletar um pod manualmente
@@ -533,7 +547,7 @@ kubectl get pods -n fiap-todo-prod -w
 
 ## 🎓 Parte 8: Conceitos Aprendidos
 
-### Passo 21: Arquitetura ArgoCD
+### Passo 22: Arquitetura ArgoCD
 
 ```mermaid
 graph TB
