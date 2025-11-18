@@ -263,8 +263,8 @@ echo "ECR URI: $ECR_URI"
 **Opção 1: Usar aplicação da Aula 03 (Recomendado)**
 
 ```bash
-# Navegar para o diretório app da Aula 03
-cd ../fiap-dclt-aula03/app  # ou o caminho onde está a Aula 03
+# Navegar para o repositório da Aula 03
+cd ../fiap-dclt-aula03  # ou o caminho onde está a Aula 03
 
 # Login no ECR
 aws ecr get-login-password \
@@ -273,7 +273,7 @@ aws ecr get-login-password \
   --username AWS \
   --password-stdin ${ECR_URI}
 
-# Build da imagem
+# Build da imagem (Dockerfile está na raiz)
 docker build -t fiap-todo-api:v1.0.0 .
 
 # Tag da imagem para o ECR
@@ -285,7 +285,7 @@ docker push ${ECR_URI}/fiap-todo-api:v1.0.0
 echo "✅ Imagem publicada: ${ECR_URI}/fiap-todo-api:v1.0.0"
 
 # Voltar para o diretório da Aula 04
-cd ../../fiap-dclt-aula04
+cd ../fiap-dclt-aula04
 ```
 
 **Opção 2: Usar imagem pública de exemplo (Alternativa rápida)**
