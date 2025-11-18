@@ -732,51 +732,6 @@ git log --oneline
 
 ---
 
-## 📊 Parte 8: Resumo e Comparação Final
-
-### FluxCD - Prós e Contras
-
-**✅ Vantagens:**
-- GitOps 100% puro (tudo via Git)
-- Image Automation nativa
-- Mais leve que ArgoCD
-- Modular (instala só o que precisa)
-- Auto-gerenciamento via GitOps
-
-**❌ Desvantagens:**
-- Sem UI visual (apenas CLI)
-- Curva de aprendizado maior
-- Troubleshooting mais difícil
-- Multi-cluster requer config manual
-
-### ArgoCD - Prós e Contras
-
-**✅ Vantagens:**
-- UI visual rica e intuitiva
-- Fácil de aprender e usar
-- Multi-cluster nativo
-- RBAC/SSO integrado
-- Troubleshooting visual
-
-**❌ Desvantagens:**
-- Sem Image Automation nativa
-- Mais pesado
-- Permite bypass do GitOps via UI
-
-### Nossa Recomendação
-
-**Para Produção:**
-- **Pequenas equipes / Iniciantes**: ArgoCD (UI facilita)
-- **Equipes DevOps maduras**: FluxCD (GitOps puro)
-- **Precisa Image Automation**: FluxCD
-- **Multi-cluster complexo**: ArgoCD
-
-**Para Aprendizado:**
-- **Comece com ArgoCD** (mais visual)
-- **Depois experimente FluxCD** (entender GitOps puro)
-
----
-
 ## 🧹 Parte 9: Limpeza (Opcional)
 
 ### Desinstalar FluxCD
